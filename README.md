@@ -1,2 +1,2 @@
 # SWD_Gr6
-Contains all projects, documents
+Contains UI for PreOJT-RiskAlert
