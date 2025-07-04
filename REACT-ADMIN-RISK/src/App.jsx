@@ -18,7 +18,7 @@ function App() {
       <ThemeProvider theme={theme} >
         <CssBaseline />
         <Routes>
-          {/* LOGIN PAGE */}
+          {/* PUBLIC PAGE */}
           <Route path="/login" element={<Login />} />
           <Route path="/logout" element={<Logout />} />
 

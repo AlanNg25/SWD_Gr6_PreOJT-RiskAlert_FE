@@ -1,26 +1,40 @@
-import { Alert, AlertTitle, Box, Button, Checkbox, Container, FormControlLabel, TextField, Typography, useTheme } from '@mui/material'
+import { Box, Button, Checkbox, Container, FormControl, FormControlLabel, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField, Typography, useTheme } from '@mui/material'
 import { tokens } from '../../theme/theme';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import AlertNotify from '../../components/global/AlertNotify';
 import { apiClient } from '../../services/api/apiClient'
 import { useNavigate } from 'react-router-dom';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { getValidUser } from '../../utils/auth';
+
+const AUTH_STORAGE = "AUTHENTICATED_USER";
 
 function Login() {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const navigate = useNavigate();
+    const Logged = getValidUser(AUTH_STORAGE)
 
+    const [loading, setLoading] = useState(false)
     const [errorMessage, setErrorMessage] = useState('');
     const [warningMessage, setWarningMessage] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleLogin = async (e) => {
-        localStorage.clear();
+    const handleMouseDownPassword = (event) => {
+        event.preventDefault();
+    };
 
+    const handleMouseUpPassword = (event) => {
+        event.preventDefault();
+    };
+
+    const handleLogin = async (e) => {
         e.preventDefault();
         try {
+            setLoading(true);
             const emailInput = email;
             const passInput = password;
             const res = await apiClient("/api/Auth/login", "POST", {
@@ -35,45 +49,26 @@ function Login() {
             }
         } catch (error) {
             setErrorMessage(error.message || "An error occurred during login.");
+        } finally {
+            setLoading(false);
         }
     };
 
-    // const handleAuthSuccess = async (res) => {
-    //     try {
-    //         await saveAuthDataAsync(res);
-    //         navigate("/");
-    //     } catch (error) {
-    //         console.error("Authentication storage error:", error);
-    //         setErrorMessage("Failed to save authentication data. Please try again.");
-    //     }
-    // };
+    const handleClickShowPassword = () => setShowPassword(prev => !prev);
 
-    // const saveAuthDataAsync = (userData) => {
-    //     return new Promise((resolve, reject) => {
-    //         try {
-    //             localStorage.setItem("AUTHENTICATED_USER", userData);
-
-    //             // Use setTimeout to ensure the operation completes
-    //             setTimeout(() => {
-    //                 const savedData = localStorage.getItem("AUTHENTICATED_USER");
-    //                 if (savedData && savedData.token) {
-    //                     resolve(true);
-    //                 } else {
-    //                     reject(new Error("Data verification failed"));
-    //                 }
-    //             }, 10); // Small delay to ensure write completion
-
-    //         } catch (error) {
-    //             reject(error);
-    //         }
-    //     });
-    // };
+    useEffect(() => {
+        if (Logged != null) {
+            navigate("/");
+        }
+    }, [Logged, navigate]);
 
     return (
-        <Box sx={{
-            height: '100vh',
-            alignContent: 'center'
-        }}>
+        <Box
+            sx={{
+                height: '100vh',
+                alignContent: 'center'
+            }}
+        >
             {errorMessage && (
                 <AlertNotify
                     message={errorMessage}
@@ -88,15 +83,17 @@ function Login() {
                     onClose={() => warningMessage('')}
                 />
             )}
-            <Container maxWidth="xs" sx={{
-                height: 'full-content',
-                padding: '7vh 0',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                borderRadius: 2,
-                boxShadow: `0 4px 24px ${colors.secondary[400]}`,
-            }} >
+            <Container
+                maxWidth="xs"
+                sx={{
+                    height: 'full-content',
+                    padding: '7vh 0',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    borderRadius: 2,
+                    boxShadow: `0 4px 24px ${colors.secondary[400]}`,
+                }} >
                 <Typography variant="h2" fontWeight={'Bold'} gutterBottom align='center'>
                     Welcome back
                 </Typography>
@@ -104,20 +101,44 @@ function Login() {
                     Login To Your Account
                 </Typography>
                 <form
+                    onLoad={loading}
                     onSubmit={handleLogin}
                 >
                     <TextField
+                        disabled={loading}
                         onChange={e => setEmail(e.target.value)}
                         label="Email"
                         variant="outlined" margin="normal"
                         fullWidth required />
-                    <TextField
-                        onChange={e => setPassword(e.target.value)}
-                        label="Password" type="password"
-                        variant="outlined" margin="normal"
-                        fullWidth required />
+                    <FormControl sx={{ m: '.5em auto 1em', width: '100%' }} variant="outlined">
+                        <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+                        <OutlinedInput
+                            onLoad={loading}
+                            id="outlined-adornment-password"
+                            type={showPassword ? 'text' : 'password'}
+                            onChange={(e) => setPassword(e.currentTarget.value)}
+                            endAdornment={
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        aria-label={
+                                            showPassword ? 'hide the password' : 'display the password'
+                                        }
+                                        onClick={handleClickShowPassword}
+                                        onMouseDown={handleMouseDownPassword}
+                                        onMouseUp={handleMouseUpPassword}
+                                        edge="end"
+                                    >
+                                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                                    </IconButton>
+                                </InputAdornment>
+                            }
+                            label="Password"
+                        />
+                    </FormControl>
 
                     <Button
+                        loading={loading}
+                        loadingPosition="start"
                         type="submit"
                         variant="contained"
                         color="primary"

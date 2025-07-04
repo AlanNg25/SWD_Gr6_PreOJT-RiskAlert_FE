@@ -1,5 +1,5 @@
 import { Outlet, Navigate } from "react-router-dom";
-import { isTokenExpired, getValidUser } from './auth'
+import { getValidUser } from './auth'
 
 /**
  - ProtectedRoute component restricts access to routes based on authentication.
@@ -17,17 +17,14 @@ const AUTH_STORAGE = "AUTHENTICATED_USER"
 function ProtectedRoute() {
   try {
     const userData = getValidUser(AUTH_STORAGE);
-    if (userData == null) {
+    if (userData === null) {
       return <Navigate to="/login" />;
     }
-
-    if (isTokenExpired(userData.token)) throw new Error();
-
     return <Outlet />;
   } catch (error) {
     console.log('protect route: ', error);
     localStorage.removeItem(AUTH_STORAGE);
-    return <Navigate to="/logout" />;
+    return <Navigate to="/logout" replace />;
   }
 }
 

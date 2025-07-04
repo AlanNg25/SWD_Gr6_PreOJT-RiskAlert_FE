@@ -6,7 +6,6 @@ import {
     Box,
     Button,
     ButtonBase,
-    IconButton,
     Typography,
     useTheme,
 } from '@mui/material';
@@ -55,6 +54,7 @@ const SideBar = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
 
+    // const [loading, setLoading] = useState(false);
     const [collapsed, isCollapsed] = useState(false);
     const [avatarSrc, setAvatarSrc] = useState(undefined);
     const [selected, setSelected] = useState("Dashboard");
@@ -80,7 +80,7 @@ const SideBar = () => {
             }
         };
         fetchAvatarUrl();
-    }, []);
+    }, [userData.fullName]);
 
     return (
         <Box
@@ -92,7 +92,7 @@ const SideBar = () => {
                     borderRadius: 'none'
                 },
                 '& .ps-menu-button:hover': {
-                    background: `${colors.primary[400]}!important`,
+                    background: `${colors.primary[800]}!important`,
                     transition: 'background-color 0.5s ease',
                 },
                 '& .ps-menu-button': {
@@ -138,7 +138,7 @@ const SideBar = () => {
                                     justifyContent: 'center',
                                     mb: 1,
                                     '&:hover': {
-                                        background: `${colors.primary[400]}!important`,
+                                        background: `${colors.primary[800]}!important`,
                                     },
                                 }}
                             >

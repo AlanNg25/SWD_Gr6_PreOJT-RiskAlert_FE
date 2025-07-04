@@ -12,7 +12,9 @@ import { storage } from "../../config/firebase"; // Adjust path if needed
 export async function uploadImageWithProgress(file, folder = "images", onProgress) {
     if (!file) throw new Error("No file provided");
 
-    const fileName = `${Date.now()}_${file.name}`;
+    const now = new Date();
+    const dateTimeString = now.toISOString().replace(/[:.]/g, '-');
+    const fileName = `${dateTimeString}_${file.name}`;
     const fileRef = ref(storage, `${folder}/${fileName}`);
     const uploadTask = uploadBytesResumable(fileRef, file);
 
@@ -48,6 +50,11 @@ export async function getFirstAvatarUrl(folder = "avatars") {
     if (!listResult.items.length) {
         throw new Error("No files found in the avatars folder");
     }
+
+    listResult.items.sort((a, b) => {
+        const getTimestamp = item => item.name.split('_')[0];
+        return getTimestamp(b).localeCompare(getTimestamp(a));
+    });
 
     const firstFileRef = listResult.items[0];
     return await getDownloadURL(firstFileRef);

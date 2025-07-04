@@ -1,8 +1,8 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, useMediaQuery, useTheme } from "@mui/material"
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography, useMediaQuery, useTheme } from "@mui/material"
 import { tokens } from "../../theme/theme";
 
 
-const DialogCustom = ({
+const YesNoDialogCustom = ({
     diaglogTitle,
     contentTXT,
     openState,
@@ -25,19 +25,18 @@ const DialogCustom = ({
         >
             <DialogTitle
                 id="responsive-dialog-title"
-                sx={{
-                    backgroundColor: colors.primary[600],
-                    color: colors.greyAccent[100],
-                }}
+                sx={{ backgroundColor: colors.primary[900] }}
             >
-                {diaglogTitle}
+                <Typography variant="h5" textTransform={'uppercase'} fontWeight={'bold'}>
+                    {diaglogTitle}
+                </Typography>
             </DialogTitle>
-            <DialogContent>
+            <DialogContent sx={{ backgroundColor: colors.primary[900] }}>
                 <DialogContentText sx={{ color: colors.greyAccent[100] }}>
                     {contentTXT}
                 </DialogContentText>
             </DialogContent>
-            <DialogActions sx={{ backgroundColor: colors.primary[500] }}>
+            <DialogActions sx={{ backgroundColor: colors.primary[900] }}>
                 <Button
                     autoFocus
                     onClick={() => handleAnswer('no')}
@@ -45,7 +44,7 @@ const DialogCustom = ({
                         color: 'red',
                         borderColor: 'red',
                         '&:hover': {
-                            backgroundColor: 'grey',
+                            backgroundColor: '#ff000063',
                             color: colors.greyAccent[100],
                         }
                     }}
@@ -73,4 +72,4 @@ const DialogCustom = ({
     )
 }
 
-export default DialogCustom
+export default YesNoDialogCustom

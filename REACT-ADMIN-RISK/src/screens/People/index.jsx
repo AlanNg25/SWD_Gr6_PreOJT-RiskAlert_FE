@@ -3,24 +3,26 @@ import { Box, Paper, Typography, useTheme, Button, Stack } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import AlertNotify from '../../components/global/AlertNotify';
 import { tokens } from '../../theme/theme';
-import { useDeleteUser, usePeopleWithMajor, useUpdateUser } from '../../hooks/ManageUser';
+import { useDeleteUser, usePeopleWithMajor } from '../../hooks/ManageUser';
 import DialogCustom from '../../components/global/DialogCustom';
-import FormDialog from '../../components/global/FormDialog';
+import FormDialog from '../../components/features/user-management/FormDialog';
 import { peopleApi } from '../../services/api/peopleAPI';
 
 export default function People() {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
+
     const [alert, setAlert] = useState({ message: '', severity: 'info' });
     const [openDialog, setOpenDiaglog] = useState(false);
     const [openModalEdit, setOpenModelEdit] = useState(false);
     const [openModalCreate, setOpenModalCreate] = useState(false);
     const [userIdMng, setUserIdMng] = useState('');
 
-    const { people, loading, error: fetchError, refetch } = usePeopleWithMajor();
-    const { deleteUser, loading: deleteLoading, error: deleteError } = useDeleteUser();
+    const { people, loading, refetch } = usePeopleWithMajor();
+    const { deleteUser, deleteLoading } = useDeleteUser();
     // const { updateUser, loading: updateLoading, error: updateError } = useUpdateUser();
 
+    // OPEN DIALOG
     const handleOpenDialog = async (id) => {
         setUserIdMng(id);
         setOpenDiaglog((prev) => (!prev));
@@ -33,6 +35,7 @@ export default function People() {
         setOpenModalCreate((prev) => (!prev));
     }
 
+    // CLOSE DIALOG
     const handleClose = (res) => {
         setOpenDiaglog((prev) => (!prev));
 
@@ -53,6 +56,7 @@ export default function People() {
         setUserIdMng('');
     }
 
+    // delete
     const handleDelete = async (id) => {
         try {
             const res = await deleteUser(id);
@@ -66,6 +70,7 @@ export default function People() {
             setAlert({ message: error.message || 'An error occurred', severity: 'error' });
         }
     };
+    // update
     const handleUpdate = async (row) => {
         try {
             if (userIdMng == null || row == null) return;
@@ -90,6 +95,7 @@ export default function People() {
         }
         setUserIdMng('');
     }
+    // create
     const handleCreate = async (row) => {
         try {
             if (row == null) return;
@@ -119,12 +125,11 @@ export default function People() {
     const columns = [
         { field: 'code', headerName: 'Code', width: 80 },
         { field: 'fullName', headerName: 'Full Name', width: 150 },
-        { field: 'email', headerName: 'Email', width: 180 },
+        { field: 'email', headerName: 'Email', flex: 1 },
         { field: 'phone', headerName: 'Phone', width: 120 },
         { field: 'MajorCode', headerName: 'Major Code', width: 100 },
         { field: 'MajorName', headerName: 'Major Name', width: 100 },
         { field: 'role', headerName: 'Role', width: 100 },
-        { field: 'password', headerName: 'Pass', flex: 1 },
         {
             field: 'status',
             headerName: 'Status',
@@ -182,10 +187,12 @@ export default function People() {
             filterable: false,
         }
     ];
-
     const rows = Array.isArray(people)
-        ? people.map(person => ({ id: person.userID, ...person }))
+        ? people
+            .map(person => ({ id: person.userID, ...person }))
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
         : [];
+
 
     return (
         <Box m="20px">

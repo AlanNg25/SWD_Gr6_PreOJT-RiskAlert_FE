@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, MenuItem, TextField, useMediaQuery, useTheme } from "@mui/material";
-import { tokens } from "../../theme/theme";
-import AlertNotify from "./AlertNotify";
-import { majorAPI } from "../../services/api/majorAPI";
-import { peopleApi } from "../../services/api/peopleAPI";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, Grid, IconButton, Input, InputAdornment, InputLabel, MenuItem, OutlinedInput, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { tokens } from "../../../theme/theme";
+import AlertNotify from "../../global/AlertNotify";
+import { majorAPI } from "../../../services/api/majorAPI";
+import { peopleApi } from "../../../services/api/peopleAPI";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const FormDialog = ({
     formTitle,
@@ -13,25 +14,37 @@ const FormDialog = ({
     onClose,
     initialData = null,
 }) => {
-    const validRoles = ['teacher', 'advisor', 'student'];
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
+    const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+
+    const validRoles = ['Teacher', 'Advisor', 'Student'];
     const [formData, setFormData] = useState({
         fullName: initialData?.fullName || '',
         password: initialData?.password || '',
         email: initialData?.email || '',
         phone: initialData?.phone || '',
         majorID: initialData?.majorID || '',
-        role: validRoles.includes(initialData?.role?.toLowerCase()) ? initialData.role.toLowerCase() : '',
+        role: validRoles.includes(initialData?.role) ? initialData.role : '',
         code: initialData?.code || '',
         status: initialData?.status === 1 ? '1' : '0',
     });
+
+    const [showPassword, setShowPassword] = useState(false);
     const [majors, setMajors] = useState([]);
     const [users, setUsers] = useState([]);
     const [alert, setAlert] = useState({ message: '', severity: 'info' });
-    const theme = useTheme();
-    const colors = tokens(theme.palette.mode);
-    const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
-    // Fetch majors and roles on mount
+    // SHOW / UNSHOW PASSWORD 
+    const handleClickShowPassword = () => setShowPassword(prev => !prev);
+    const handleMouseDownPassword = (event) => {
+        event.preventDefault();
+    };
+    const handleMouseUpPassword = (event) => {
+        event.preventDefault();
+    };
+
+    // Fetch majors and roles for toggle
     useEffect(() => {
         const fetchMajors = async () => {
             try {
@@ -61,7 +74,7 @@ const FormDialog = ({
             email: initialData?.email || '',
             phone: initialData?.phone || '',
             majorID: initialData?.majorID || '',
-            role: validRoles.includes(initialData?.role?.toLowerCase()) ? initialData.role.toLowerCase() : '',
+            role: validRoles.includes(initialData?.role) ? initialData.role : '',
             code: initialData?.code || '',
             status: initialData?.status === 1 ? '1' : '0',
         });
@@ -77,13 +90,13 @@ const FormDialog = ({
         ) {
             let prefix = '';
             switch (formData.role) {
-                case 'teacher':
+                case 'Teacher':
                     prefix = 'TCH';
                     break;
-                case 'advisor':
+                case 'Advisor':
                     prefix = 'ADV';
                     break;
-                case 'student':
+                case 'Student':
                     prefix = 'STU';
                     break;
                 default:
@@ -148,9 +161,15 @@ const FormDialog = ({
                 id="responsive-dialog-title"
                 sx={{ backgroundColor: colors.primary[600], color: colors.greyAccent[100] }}
             >
-                {formTitle}
+                <Typography variant="h5" fontWeight={'bold'} textTransform={'uppercase'}>
+                    {formTitle}
+                </Typography>
             </DialogTitle>
-            <DialogContent>
+            <DialogContent
+                sx={{
+                    backgroundColor: colors.primary[600]
+                }}
+            >
                 {alert.message && (
                     <AlertNotify
                         message={alert.message}
@@ -198,7 +217,7 @@ const FormDialog = ({
                                 error={!formData.email}
                                 helperText={!formData.email ? 'Email is required' : ''}
                             />
-                            <TextField
+                            {/* <TextField
                                 value={formData.password}
                                 onChange={handleChange}
                                 required
@@ -212,7 +231,37 @@ const FormDialog = ({
                                 sx={textFieldSx}
                                 error={!formData.password}
                                 helperText={!formData.password ? 'Password is required' : ''}
-                            />
+                            /> */}
+                            <FormControl sx={{ m: '.5em auto 1em', width: '100%' }} variant="standard" required>
+                                <InputLabel htmlFor="standard-adornment-password" >
+                                    New Password
+                                </InputLabel>
+                                <Input
+                                    id="standard-adornment-password password"
+                                    name="password"
+                                    type={showPassword ? 'text' : 'password'}
+                                    onChange={handleChange}
+                                    endAdornment={
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label={
+                                                    showPassword ? 'hide the password' : 'display the password'
+                                                }
+                                                onClick={handleClickShowPassword}
+                                                onMouseDown={handleMouseDownPassword}
+                                                onMouseUp={handleMouseUpPassword}
+                                                edge="end"
+                                            >
+                                                {showPassword ? <VisibilityOff /> : <Visibility />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    }
+                                    label="Password"
+                                    required
+                                    error={!formData.password}
+                                    helperText={!formData.password ? 'Password is required' : ''}
+                                />
+                            </FormControl>
                             <TextField
                                 value={formData.phone}
                                 onChange={handleChange}
@@ -294,9 +343,9 @@ const FormDialog = ({
                                 <MenuItem value="" disabled>
                                     Select role
                                 </MenuItem>
-                                <MenuItem value="teacher">Teacher</MenuItem>
-                                <MenuItem value="advisor">Advisor</MenuItem>
-                                <MenuItem value="student">Student</MenuItem>
+                                <MenuItem value="Teacher">Teacher</MenuItem>
+                                <MenuItem value="Advisor">Advisor</MenuItem>
+                                <MenuItem value="Student">Student</MenuItem>
                             </TextField>
                         </Grid>
                     </Grid>
