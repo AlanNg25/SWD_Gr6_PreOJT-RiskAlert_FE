@@ -87,7 +87,7 @@ function Login() {
                 maxWidth="xs"
                 sx={{
                     height: 'full-content',
-                    padding: '7vh 0',
+                    padding: '7vh 5vh',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'center',
@@ -101,7 +101,7 @@ function Login() {
                     Login To Your Account
                 </Typography>
                 <form
-                    onLoad={loading}
+                    onLoad={() => { return loading ? true : undefined }}
                     onSubmit={handleLogin}
                 >
                     <TextField
@@ -113,7 +113,7 @@ function Login() {
                     <FormControl sx={{ m: '.5em auto 1em', width: '100%' }} variant="outlined">
                         <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
                         <OutlinedInput
-                            onLoad={loading}
+                            onLoad={() => { return loading ? true : undefined }}
                             id="outlined-adornment-password"
                             type={showPassword ? 'text' : 'password'}
                             onChange={(e) => setPassword(e.currentTarget.value)}

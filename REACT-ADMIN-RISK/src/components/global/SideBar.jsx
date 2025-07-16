@@ -1,5 +1,4 @@
 import { Sidebar, MenuItem, Menu } from 'react-pro-sidebar';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import {
     Avatar,
@@ -7,6 +6,7 @@ import {
     Button,
     ButtonBase,
     Typography,
+    useMediaQuery,
     useTheme,
 } from '@mui/material';
 import { tokens } from '../../theme/theme';
@@ -15,36 +15,18 @@ import { getFirstAvatarUrl, uploadImageWithProgress } from '../../services/fireb
 import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import PeopleOutlinedIcon from '@mui/icons-material/PeopleOutlined';
+import ClassOutlinedIcon from '@mui/icons-material/ClassOutlined';
+import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
+import PsychologyAltOutlinedIcon from '@mui/icons-material/PsychologyAltOutlined';
+import AssistantOutlinedIcon from '@mui/icons-material/AssistantOutlined';
 import LoginOutlinedIcon from '@mui/icons-material/LoginOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
+import GradeOutlinedIcon from '@mui/icons-material/GradeOutlined';
+// import DoorbellOutlinedIcon from '@mui/icons-material/DoorbellOutlined';
+import NotificationImportantOutlinedIcon from '@mui/icons-material/NotificationImportantOutlined';
+// import ChecklistRtlOutlinedIcon from '@mui/icons-material/ChecklistRtlOutlined';
 
-
-const Item = ({ title, to, icon, selected, setSelected, collapsed }) => {
-    const theme = useTheme();
-    const colors = tokens(theme.palette.mode);
-    const navigate = useNavigate();
-
-    return (
-        <MenuItem
-            active={selected === title}
-            style={{
-                color: colors.greyAccent[100],
-                backgroundColor: selected === title ? colors.purpleAccent[800] : 'transparent',
-                height: '3em',
-                borderRadius: !collapsed ? ".5em" : "3em",
-            }}
-            onClick={() => {
-                setSelected(title);
-                navigate(to);
-            }}
-            icon={icon}
-        >
-            {!collapsed && (
-                <Typography variant='h5'>{title}</Typography>
-            )}
-        </MenuItem >
-    );
-};
+import { Item } from './ItemMenu';
 
 
 const SideBar = () => {
@@ -53,11 +35,12 @@ const SideBar = () => {
 
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
+    const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
 
     // const [loading, setLoading] = useState(false);
     const [collapsed, isCollapsed] = useState(false);
     const [avatarSrc, setAvatarSrc] = useState(undefined);
-    const [selected, setSelected] = useState("Dashboard");
+    const [selected, setSelected] = useState("/");
 
 
     const handleAvatarChange = async (event) => {
@@ -69,6 +52,10 @@ const SideBar = () => {
             setAvatarSrc(uploadedUrl);
         }
     };
+
+    useEffect(() => {
+        isCollapsed(isSmallScreen);
+    }, [isSmallScreen]);
 
     useEffect(() => {
         const fetchAvatarUrl = async () => {
@@ -101,9 +88,15 @@ const SideBar = () => {
                 }
             }}
         >
-            <Sidebar collapsed={collapsed}
+            <Sidebar
+                collapsed={
+                    collapsed
+                }
+                transitionDuration={500}
                 width='240px'
-                style={{ height: '100vh' }}>
+                style={{
+                    height: '100vh',
+                }}>
                 <Menu>
                     {/* TopSidebar */}
                     {collapsed && (
@@ -212,6 +205,66 @@ const SideBar = () => {
                             setSelected={setSelected}
                             collapsed={collapsed}
                         />
+                        <Item
+                            title="Major"
+                            to="/major"
+                            icon={<ClassOutlinedIcon />}
+                            selected={selected}
+                            setSelected={setSelected}
+                            collapsed={collapsed}
+                        />
+                        <Item
+                            title="Notify"
+                            to="/notify"
+                            // badgeContentCount={10}
+                            // maxBadge={5}
+                            icon={<NotificationsNoneOutlinedIcon />}
+                            selected={selected}
+                            setSelected={setSelected}
+                            collapsed={collapsed}
+                        />
+                        <Item
+                            title={"Suggestion"}
+                            to={"/suggestion"}
+                            icon={<AssistantOutlinedIcon />}
+                            selected={selected}
+                            setSelected={setSelected}
+                            collapsed={collapsed}
+                        />
+                        <Item
+                            title="prediction"
+                            to="/prediction"
+                            // badgeContentCount={10}
+                            // maxBadge={5}
+                            icon={<PsychologyAltOutlinedIcon />}
+                            selected={selected}
+                            setSelected={setSelected}
+                            collapsed={collapsed}
+                        />
+                        <Item
+                            title={"Risk Analysis"}
+                            to={"/riskAnalysis"}
+                            icon={<NotificationImportantOutlinedIcon />}
+                            selected={selected}
+                            setSelected={setSelected}
+                            collapsed={collapsed}
+                        />
+                        <Item
+                            title={"Grade"}
+                            to={"/grade"}
+                            icon={<GradeOutlinedIcon />}
+                            selected={selected}
+                            setSelected={setSelected}
+                            collapsed={collapsed}
+                        />
+                        {/* <Item
+                            title={"Attendance"}
+                            to={"/attendance"}
+                            icon={<ChecklistRtlOutlinedIcon />}
+                            selected={selected}
+                            setSelected={setSelected}
+                            collapsed={collapsed}
+                        /> */}
                         <Item
                             title={"Login"}
                             to={"/login"}

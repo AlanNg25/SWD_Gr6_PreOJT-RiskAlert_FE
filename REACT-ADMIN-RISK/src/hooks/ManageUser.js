@@ -107,14 +107,3 @@ export function useDeleteUser() {
 
     return { deleteUser, loading, error };
 }
-
-export function useUpdateUser() {
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-
-    const updateUser = useCallback(async (newUser) => {
-
-    }, [])
-
-    return { updateUser, loading, error }
-}

@@ -1,10 +1,17 @@
-import { Box, ButtonBase, Typography, useTheme } from '@mui/material'
-// import { ImageGgUpdload } from '../../components/global/ImageGgUpdload';
+import { Box, Paper, Typography, useTheme } from '@mui/material'
+import { BarChart, PieChart, LineChart } from '@mui/x-charts';
 import { tokens } from '../../theme/theme';
+import LineChartCustom from '../../components/global/RiskAnalysisChart'
+import { useRiskAnalysisWithUser } from '../../hooks/ManageRiskAnalysis';
+import { Fragment } from 'react';
 
 export default function DashBoard() {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
+
+
+    const { riskAnalys } = useRiskAnalysisWithUser();
+
 
     return (
         <Box
@@ -25,28 +32,39 @@ export default function DashBoard() {
             <Box
                 mt={'1em'}
                 display={'flex'}
+                flexDirection={'column'}
                 minHeight={'30vh'}
             >
                 <Typography variant='h5' fontWeight={'bold'} >
                     Overview
                 </Typography>
                 <Box>
-
-                </Box>
-            </Box>
-            {/* DETAIL SECTION */}
-            <Box
-                mt={'1em'}
-                display={'flex'}
-                minHeight={'30vh'}
-            >
-                <Typography variant='h5' fontWeight={'bold'} >
-                    Detail
-                </Typography>
-                <Box>
-
+                    <LineChartCustom riskAnalys={riskAnalys} />
                 </Box>
             </Box>
         </Box>
     )
+}
+
+
+function CustomLine(props) {
+    const { d, ownerState, className, ...other } = props;
+
+    return (
+        <Fragment>
+            <path
+                d={d}
+                stroke={
+                    ownerState.gradientId ? `url(#${ownerState.gradientId})` : ownerState.color
+                }
+                strokeWidth={ownerState.isHighlighted ? 4 : 2}
+                strokeLinejoin="round"
+                fill="none"
+                filter={ownerState.isHighlighted ? 'brightness(120%)' : undefined}
+                opacity={ownerState.isFaded ? 0.3 : 1}
+                className={className}
+            />
+            <path d={d} stroke="transparent" strokeWidth={25} fill="none" {...other} />
+        </Fragment>
+    );
 }

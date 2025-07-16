@@ -5,7 +5,7 @@ export const majorAPI = {
     getAll: () => apiClient('/api/Major'),
 
     // Get major by ID
-    getById: (id) => apiClient(`api/Major/${id}`),
+    getById: (id) => apiClient(`/api/Major/${id}`),
 
     // Create new major
     // Example Value
@@ -13,11 +13,11 @@ export const majorAPI = {
     //   "majorCode": "string",
     //   "majorName": "string"
     // }
-    create: (majorData) => apiClient('api/Major', 'POST', majorData),
+    create: (majorData) => apiClient('/api/Major', 'POST', majorData),
 
     // Update major
-    update: (id, majorData) => apiClient(`api/Major/${id}`, 'PUT', majorData),
+    update: (id, majorData) => apiClient(`/api/Major/${id}`, 'PUT', majorData),
 
     // Delete major
-    delete: (id) => apiClient(`api/Major/${id}`, 'DELETE')
+    delete: (id) => apiClient(`/api/Major/${id}`, 'DELETE')
 };

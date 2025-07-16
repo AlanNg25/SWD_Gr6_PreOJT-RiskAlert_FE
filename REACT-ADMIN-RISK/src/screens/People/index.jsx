@@ -1,9 +1,10 @@
-import { useState } from 'react';
-import { Box, Paper, Typography, useTheme, Button, Stack } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { Box, Paper, Typography, useTheme, Button, Stack, Autocomplete, TextField } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import AlertNotify from '../../components/global/AlertNotify';
 import { tokens } from '../../theme/theme';
 import { useDeleteUser, usePeopleWithMajor } from '../../hooks/ManageUser';
+import { useMajors } from '../../hooks/ManageMajor';
 import DialogCustom from '../../components/global/DialogCustom';
 import FormDialog from '../../components/features/user-management/FormDialog';
 import { peopleApi } from '../../services/api/peopleAPI';
@@ -19,8 +20,55 @@ export default function People() {
     const [userIdMng, setUserIdMng] = useState('');
 
     const { people, loading, refetch } = usePeopleWithMajor();
+    const { majors } = useMajors();
     const { deleteUser, deleteLoading } = useDeleteUser();
-    // const { updateUser, loading: updateLoading, error: updateError } = useUpdateUser();
+
+    const [selectedPerson, setSelectedPerson] = useState(null); // State to hold the selected person
+    const [filteredRows, setFilteredRows] = useState([])
+    const defaultProps = {
+        options: Array.isArray(people)
+            ? people
+                .map((person) => person)
+                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            : [],
+        getOptionLabel: (option) => `${option.email} \n (${option.userID})`, // Display email and ID
+    };
+
+    // Fetch person by ID when selected
+    useEffect(() => {
+        if (selectedPerson) {
+            const fetchPersonById = async () => {
+                try {
+                    const res = await peopleApi.getById(selectedPerson.userID);
+                    if (res) {
+                        const major = majors.find((m) => m.majorID == res.majorID)
+                        // Assuming the API returns a single person object
+                        setFilteredRows([{
+                            id: res.userID, ...res,
+                            MajorCode: major.majorCode,
+                            MajorName: major.majorName
+                        }]);
+                    } else {
+                        setAlert({ message: 'Failed to fetch person', severity: 'error' });
+                        setFilteredRows([]);
+                    }
+                } catch (error) {
+                    setAlert({ message: error.message || 'An error occurred', severity: 'error' });
+                    setFilteredRows([]);
+                }
+            };
+            fetchPersonById();
+        } else {
+            // If no person is selected, show all rows
+            setFilteredRows(
+                Array.isArray(people)
+                    ? people
+                        .map((person) => ({ id: person.userID, ...person }))
+                        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                    : []
+            );
+        }
+    }, [selectedPerson, people, majors]);
 
     // OPEN DIALOG
     const handleOpenDialog = async (id) => {
@@ -63,6 +111,7 @@ export default function People() {
             if (res.success) {
                 setAlert({ message: 'User deleted successfully', severity: 'success' });
                 await refetch(); // Refresh DataGrid after successful delete
+                setSelectedPerson(null);
             } else {
                 setAlert({ message: res.error || 'Failed to delete user', severity: 'error' });
             }
@@ -89,6 +138,7 @@ export default function People() {
             if (res.ok) {
                 setAlert({ message: 'User updated successfully', severity: 'success' });
                 await refetch();
+                setSelectedPerson(null);
             }
         } catch (error) {
             setAlert({ message: error.message || 'An error occurred', severity: 'error' });
@@ -136,14 +186,14 @@ export default function People() {
             width: 80,
             renderCell: (params) => (
                 params.value === 1
-                    ? <span title="Enabled" style={{ color: 'green' }}>🟢</span>
-                    : <span title="Disabled" style={{ color: 'red' }}>🔴</span>
+                    ? <span title="Enabled" style={{ color: 'green', display: 'flex', justifyContent: 'center' }}>🟢</span>
+                    : <span title="Disabled" style={{ color: 'red', display: 'flex', justifyContent: 'center' }}>🔴</span>
             )
         },
         {
             field: 'createdAt', headerName: 'Created At', width: 90,
             renderCell: (params) => {
-                return new Date(params.value).toLocaleDateString('en-GB');
+                return new Date(params.value).toLocaleDateString('vi-VN');
             }
         },
         {
@@ -187,11 +237,7 @@ export default function People() {
             filterable: false,
         }
     ];
-    const rows = Array.isArray(people)
-        ? people
-            .map(person => ({ id: person.userID, ...person }))
-            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        : [];
+
 
 
     return (
@@ -251,17 +297,41 @@ export default function People() {
             <Box mt="20px">
                 <Paper
                     sx={{
-                        backgroundColor: 'transparent'
+                        backgroundColor: 'transparent',
+                        boxShadow: 0
                     }} >
                     <Stack direction={'row'} justifyContent={'space-between'}>
                         <Typography variant="h4" p="10px">
                             Detail
                         </Typography>
+                        <Box
+                            display={'flex'}
+                            alignContent={'flex-start'}
+                            flex={1}
+                        >
+                            <Autocomplete
+                                {...defaultProps}
+                                id="clear-on-escape"
+                                clearOnEscape
+                                value={selectedPerson}
+                                onChange={(event, newValue) => {
+                                    setSelectedPerson(newValue); // Update selected person
+                                }}
+                                renderInput={(params) => (
+                                    <TextField {...params} label="Choose Person" variant="standard"
+                                        sx={{
+                                            width: 260
+                                        }}
+                                    />
+                                )}
+                            />
+                        </Box>
                         <Button
                             style={{
                                 height: '3em',
                                 margin: 'auto 1em',
-                                color: colors.primary[900]
+                                color: colors.greyAccent[900],
+                                fontWeight: 'bold'
                             }}
                             variant="contained"
                             color="success"
@@ -275,19 +345,23 @@ export default function People() {
                     <Box
                         sx={{
                             '& .MuiDataGrid-root': {
-                                border: `.5px solid ${colors.greyAccent[500]}`,
+                                borderRadius: '20px',
+                                boxShadow: 4
+                            },
+                            '& .MuiDataGrid-columnHeader': {
+                                backgroundColor: colors.greyAccent[900],
+                            },
+                            '& .MuiDataGrid-columnHeaderTitle': {
+                                fontWeight: 'bold'
                             },
                             '& .MuiDataGrid-cell': {
                                 borderBottom: 'none',
-                            },
-                            '& .MuiDataGrid-virtualScroller': {
-                                backgroundColor: colors.primary[900],
                             },
                             height: '36em'
                         }}
                     >
                         <DataGrid
-                            rows={rows}
+                            rows={filteredRows}
                             columns={columns}
                             initialState={{ pagination: { paginationModel } }}
                             pageSizeOptions={[paginationModel.pageSize]}
@@ -296,7 +370,7 @@ export default function People() {
                         />
                     </Box>
                 </Paper>
-            </Box>
-        </Box>
+            </Box >
+        </Box >
     );
 }

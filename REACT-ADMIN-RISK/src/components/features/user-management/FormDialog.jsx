@@ -37,12 +37,6 @@ const FormDialog = ({
 
     // SHOW / UNSHOW PASSWORD 
     const handleClickShowPassword = () => setShowPassword(prev => !prev);
-    const handleMouseDownPassword = (event) => {
-        event.preventDefault();
-    };
-    const handleMouseUpPassword = (event) => {
-        event.preventDefault();
-    };
 
     // Fetch majors and roles for toggle
     useEffect(() => {
@@ -111,7 +105,7 @@ const FormDialog = ({
                     maxNumber = numPart;
                 }
             });
-            const nextNumber = (maxNumber + 1).toString().padStart(4, '0');
+            const nextNumber = (maxNumber + 1).toString().padStart(3, '0');
             setFormData((prev) => ({ ...prev, code: `${prefix}${nextNumber}` }));
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -161,7 +155,7 @@ const FormDialog = ({
                 id="responsive-dialog-title"
                 sx={{ backgroundColor: colors.primary[600], color: colors.greyAccent[100] }}
             >
-                <Typography variant="h5" fontWeight={'bold'} textTransform={'uppercase'}>
+                <Typography fontWeight={'bold'} textTransform={'uppercase'}>
                     {formTitle}
                 </Typography>
             </DialogTitle>
@@ -185,12 +179,11 @@ const FormDialog = ({
                 <form onSubmit={handleSubmit}>
                     <Grid container spacing={3}>
                         {/* Left Column */}
-                        <Grid item xs={12} md={6}>
+                        <Grid xs={12} md={6}>
                             <TextField
                                 value={formData.fullName}
                                 onChange={handleChange}
                                 autoFocus
-                                required
                                 margin="dense"
                                 id="fullName"
                                 name="fullName"
@@ -205,7 +198,6 @@ const FormDialog = ({
                             <TextField
                                 value={formData.email}
                                 onChange={handleChange}
-                                required
                                 margin="dense"
                                 id="email"
                                 name="email"
@@ -217,55 +209,24 @@ const FormDialog = ({
                                 error={!formData.email}
                                 helperText={!formData.email ? 'Email is required' : ''}
                             />
-                            {/* <TextField
+                            <TextField
                                 value={formData.password}
                                 onChange={handleChange}
-                                required
-                                margin="dense"
-                                id="password"
+                                onClick={handleClickShowPassword}
+                                // onMouseUp={handleMouseUpPassword}
+                                // onMouseDown={handleMouseDownPassword}
+                                id="standard-error-helper-text"
                                 name="password"
                                 label="New Password"
                                 type="password"
                                 fullWidth
                                 variant="standard"
-                                sx={textFieldSx}
                                 error={!formData.password}
-                                helperText={!formData.password ? 'Password is required' : ''}
-                            /> */}
-                            <FormControl sx={{ m: '.5em auto 1em', width: '100%' }} variant="standard" required>
-                                <InputLabel htmlFor="standard-adornment-password" >
-                                    New Password
-                                </InputLabel>
-                                <Input
-                                    id="standard-adornment-password password"
-                                    name="password"
-                                    type={showPassword ? 'text' : 'password'}
-                                    onChange={handleChange}
-                                    endAdornment={
-                                        <InputAdornment position="end">
-                                            <IconButton
-                                                aria-label={
-                                                    showPassword ? 'hide the password' : 'display the password'
-                                                }
-                                                onClick={handleClickShowPassword}
-                                                onMouseDown={handleMouseDownPassword}
-                                                onMouseUp={handleMouseUpPassword}
-                                                edge="end"
-                                            >
-                                                {showPassword ? <VisibilityOff /> : <Visibility />}
-                                            </IconButton>
-                                        </InputAdornment>
-                                    }
-                                    label="Password"
-                                    required
-                                    error={!formData.password}
-                                    helperText={!formData.password ? 'Password is required' : ''}
-                                />
-                            </FormControl>
+                                helperText={!formData.password ? 'Phone Number is required' : ''}
+                            />
                             <TextField
                                 value={formData.phone}
                                 onChange={handleChange}
-                                required
                                 margin="dense"
                                 id="phone"
                                 name="phone"
@@ -281,7 +242,6 @@ const FormDialog = ({
                                 select
                                 value={formData.majorID}
                                 onChange={handleChange}
-                                required
                                 margin="dense"
                                 id="majorID"
                                 name="majorID"
@@ -308,7 +268,6 @@ const FormDialog = ({
                                 select
                                 value={formData.status}
                                 onChange={handleChange}
-                                required
                                 margin="dense"
                                 id="status"
                                 name="status"
@@ -329,7 +288,6 @@ const FormDialog = ({
                                 select
                                 value={formData.role}
                                 onChange={handleChange}
-                                required
                                 margin="dense"
                                 id="role"
                                 name="role"

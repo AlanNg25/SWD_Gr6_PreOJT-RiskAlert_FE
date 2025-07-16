@@ -1,10 +1,10 @@
 import { Box, Breadcrumbs, IconButton, Input, InputBase, useTheme } from '@mui/material';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+// import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined'
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined'
-import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined'
-import PeopleOutlinedIcon from '@mui/icons-material/PeopleOutlined'
-import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined'
+// import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined'
+// import PeopleOutlinedIcon from '@mui/icons-material/PeopleOutlined'
+// import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined'
 
 
 import React, { useContext } from 'react'
@@ -34,12 +34,12 @@ const NavBar = ({ children }) => {
                         : <LightModeOutlinedIcon />
                     }
                 </IconButton>
-                <IconButton >
+                {/* <IconButton >
                     <SettingsOutlinedIcon />
                 </IconButton>
                 <IconButton >
                     <PeopleOutlinedIcon />
-                </IconButton>
+                </IconButton> */}
             </Box>
         </Box>
     )
