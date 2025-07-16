@@ -60,7 +60,7 @@ const RiskAnalysisChart = ({ riskAnalys = [] }) => {
         });
 
         return { finalData, stats: riskCounts, studentDetails };
-    }, [riskAnalys]); // Thêm riskAnalys vào dependency array
+    }, [riskAnalys]);
 
     const getRiskColor = (level) => {
         switch (level) {

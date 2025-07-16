@@ -30,7 +30,14 @@ export default function Grade() {
             field: 'student.email',
             headerName: 'Student Email',
             minWidth: 200,
+            flex: 1,
             renderCell: (params) => params.row.student?.email || '',
+        },
+        {
+            field: 'student.fullname',
+            headerName: 'Student Email',
+            minWidth: 200,
+            renderCell: (params) => params.row.student?.fullName || '',
         },
         {
             field: 'course.courseCode',

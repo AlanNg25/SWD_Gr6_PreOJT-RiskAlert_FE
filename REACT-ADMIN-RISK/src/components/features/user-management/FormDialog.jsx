@@ -153,7 +153,7 @@ const FormDialog = ({
         >
             <DialogTitle
                 id="responsive-dialog-title"
-                sx={{ backgroundColor: colors.primary[600], color: colors.greyAccent[100] }}
+                sx={{ backgroundColor: colors.primary[900], color: colors.greyAccent[100] }}
             >
                 <Typography fontWeight={'bold'} textTransform={'uppercase'}>
                     {formTitle}
@@ -161,7 +161,7 @@ const FormDialog = ({
             </DialogTitle>
             <DialogContent
                 sx={{
-                    backgroundColor: colors.primary[600]
+                    backgroundColor: colors.primary[900]
                 }}
             >
                 {alert.message && (

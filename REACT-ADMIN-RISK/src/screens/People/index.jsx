@@ -31,7 +31,7 @@ export default function People() {
                 .map((person) => person)
                 .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
             : [],
-        getOptionLabel: (option) => `${option.email} \n (${option.userID})`, // Display email and ID
+        getOptionLabel: (option) => `${option.email} \n (${option.code})`, // Display email and ID
     };
 
     // Fetch person by ID when selected
