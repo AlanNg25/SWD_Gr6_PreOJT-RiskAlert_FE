@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { LineChart } from '@mui/x-charts/LineChart';
 import { Card, CardContent, Typography, Box, Grid, Paper, Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 
@@ -6,9 +6,9 @@ const RiskAnalysisChart = ({ riskAnalys = [] }) => {
     // Xử lý dữ liệu
     const { finalData, stats, studentDetails } = useMemo(() => {
         const riskLevelMap = {
-            Low: 1,
-            Moderate: 2,
-            High: 3,
+            "1": 1,
+            "2": 2,
+            "3": 3
         };
 
         // Lọc dữ liệu không bị xóa
@@ -43,7 +43,10 @@ const RiskAnalysisChart = ({ riskAnalys = [] }) => {
         riskAnalys
             .filter((risk) => !risk.isDeleted)
             .forEach((risk) => {
-                riskCounts[risk.riskLevel]++;
+                const riskLevel = risk.riskLevel === "1" ? "Low"
+                    : risk.riskLevel === "2" ? "Moderate"
+                        : risk.riskLevel === "3" ? "High" : "High";
+                riskCounts[riskLevel]++;
             });
 
         // Thu thập chi tiết sinh viên theo mức độ rủi ro
@@ -223,9 +226,9 @@ const RiskAnalysisChart = ({ riskAnalys = [] }) => {
                     Risk Level Scale:
                 </Typography>
                 <Box component="ul" sx={{ color: '#1976d2', fontSize: '0.875rem', m: 0, pl: 2 }}>
-                    <li><strong>Low (1.0)</strong>: Student performing well</li>
-                    <li><strong>Moderate (2.0)</strong>: Student needs monitoring</li>
-                    <li><strong>High (3.0)</strong>: Student at risk, immediate attention needed</li>
+                    <li><strong>Low (1)</strong>: Student performing well</li>
+                    <li><strong>Moderate (2)</strong>: Student needs monitoring</li>
+                    <li><strong>High (3)</strong>: Student at risk, immediate attention needed</li>
                 </Box>
             </Paper>
         </Box>
