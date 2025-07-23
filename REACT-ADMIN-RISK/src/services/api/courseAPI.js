@@ -8,10 +8,10 @@ export const courseAPI = {
     getById: (id) => apiClient(`/api/Course/${id}`),
 
     // Create new Course
-    create: (NotificationData) => apiClient('/api/Course', 'POST', NotificationData),
+    create: (CourseData) => apiClient('/api/Course', 'POST', CourseData),
 
     // Update Course
-    update: (id, NotificationData) => apiClient(`/api/Course/${id}`, 'PUT', NotificationData),
+    update: (id, CourseData) => apiClient(`/api/Course/${id}`, 'PUT', CourseData),
 
     // Delete Course
     delete: (id) => apiClient(`/api/Course/${id}`, 'DELETE')

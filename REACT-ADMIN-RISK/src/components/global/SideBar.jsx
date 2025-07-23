@@ -206,6 +206,14 @@ const SideBar = () => {
                             collapsed={collapsed}
                         />
                         <Item
+                            title="Course"
+                            to="/course"
+                            icon={<ClassOutlinedIcon />}
+                            selected={selected}
+                            setSelected={setSelected}
+                            collapsed={collapsed}
+                        />
+                        <Item
                             title="Major"
                             to="/major"
                             icon={<ClassOutlinedIcon />}

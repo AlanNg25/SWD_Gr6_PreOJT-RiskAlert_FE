@@ -15,6 +15,7 @@ import Grade from './screens/Grade';
 import Attendance from './screens/Attendance';
 import RiskAnalysis from './screens/RiskAnalysis/';
 import Suggestion from './screens/Suggestion';
+import Course from './screens/Course';
 // import { GoogleOAuthProvider } from '@react-oauth/google';
 
 function App() {
@@ -39,6 +40,7 @@ function App() {
             <Route path="/RiskAnalysis" element={<MainLayout> <RiskAnalysis /> </MainLayout>} />
             <Route path="/grade" element={<MainLayout> <Grade /> </MainLayout>} />
             <Route path="/attendance" element={<MainLayout> <Attendance /> </MainLayout>} />
+            <Route path="/course" element={<MainLayout><Course /></MainLayout>} />
           </Route>
 
         </Routes>
