@@ -3,29 +3,32 @@ import { DataGrid } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import AlertNotify from "../../components/global/AlertNotify";
 import { tokens } from "../../theme/theme";
-import { courseAPI } from "../../services/api/courseAPI";
-import DialogCustom from "../../components/global/DialogCustom";
-import CourseForm from "../../components/features/course-management/FormDiaglog";
-import { peopleApi } from "../../services/api/peopleAPI";
-// import { semesterApi } from "../../services/api/semesterAPI";
-// import { subjectApi } from "../../services/api/subjectAPI";
+import YesNoDialogCustom from '../../components/global/DialogCustom';
+import { useCourse, useDelete, useDropdownData } from "../../hooks/ManageCourse";
+import EditCourseForm from "../../screens/Course/EditCourseForm";
 
 export default function Course() {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
 
-    const [courses, setCourses] = useState([]);
+    const { courses, loading, error, refetch: refetchCourses } = useCourse();
+    const { deleteCourse, loading: deleteLoading } = useDelete();
+    const { teachers, semesters, subjects } = useDropdownData();
+
     const [alert, setAlert] = useState({ message: '', severity: 'info' });
-    const [loading, setLoading] = useState(true);
-    const [openDialog, setOpenDialog] = useState(false);
+    const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
     const [selectedCourse, setSelectedCourse] = useState(null);
+    const [openEditDialog, setOpenEditDialog] = useState(false);
+    const [editData, setEditData] = useState(null);
+
+
 
     const paginationModel = { page: 0, pageSize: 7 };
     const columns = [
         { field: 'courseCode', headerName: 'Course Code', width: 150 },
         { field: 'teacherName', headerName: 'Teacher', width: 200 },
         { field: 'semesterCode', headerName: 'Semester', width: 120 },
-        { 
+        {
             field: 'subject',
             headerName: 'Subject Info',
             flex: 1,
@@ -52,6 +55,7 @@ export default function Course() {
                         color="error"
                         size="small"
                         onClick={() => handleOpenDialog(params.row.id)}
+                        disabled={deleteLoading}
                     >
                         Delete
                     </Button>
@@ -61,6 +65,7 @@ export default function Course() {
                         color="secondary"
                         size="small"
                         onClick={() => handleEdit(params.row)}
+                        disabled={deleteLoading}
                     >
                         Edit
                     </Button>
@@ -69,68 +74,83 @@ export default function Course() {
         }
     ];
 
-    const fetchCourseData = async () => {
-        try {
-            const coursesData = await courseAPI.getAll();
-            
-            // Map the data with related information
-            const enrichedCourses = await Promise.all(coursesData.map(async course => {
-                const [teacher, semester, subject] = await Promise.all([
-                    peopleApi.getById(course.teacherID),
-                    semesterApi.getById(course.semesterID),
-                    subjectApi.getById(course.subjectID)
-                ]);
-
-                return {
-                    id: course.courseID,
-                    courseCode: course.courseCode,
-                    teacherName: teacher.fullName,
-                    semesterCode: semester.semesterCode,
-                    subjectCode: subject.subjectCode,
-                    subjectName: subject.subjectName,
-                    ...course
-                };
-            }));
-
-            setCourses(enrichedCourses);
-            setLoading(false);
-        } catch (error) {
-            setAlert({ 
-                message: error.message || 'Failed to fetch courses', 
-                severity: 'error' 
-            });
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchCourseData();
-    }, []);
-
     const handleOpenDialog = (courseId) => {
+        setOpenConfirmDialog(prev => !prev);
         setSelectedCourse(courseId);
-        setOpenDialog(true);
     };
 
-    const handleCloseDialog = async (confirm) => {
-        setOpenDialog(false);
-        if (confirm === 'yes' && selectedCourse) {
-            try {
-                await courseAPI.delete(selectedCourse);
-                setAlert({ 
-                    message: 'Course deleted successfully', 
-                    severity: 'success' 
-                });
-                await fetchCourseData();
-            } catch (error) {
-                setAlert({ 
-                    message: error.message || 'Failed to delete course', 
-                    severity: 'error' 
-                });
-            }
+    const handleCloseDialog = async (confirmRes) => {
+        setOpenConfirmDialog(prev => !prev);
+
+        if (confirmRes === 'no' || confirmRes === null) {
+            console.log(confirmRes);
+        }
+        else if (confirmRes === 'yes') {
+            handleDelete(selectedCourse);
         }
         setSelectedCourse(null);
     };
+
+    const handleDelete = async (id) => {
+        try {
+            const res = await deleteCourse(id);
+            if (res.success) {
+                setAlert({
+                    message: 'Course deleted successfully',
+                    severity: 'success'
+                });
+                await refetchCourses(); // Refresh DataGrid after successful delete
+                setSelectedCourse(null);
+            } else {
+                setAlert({
+                    message: res.error || 'Failed to delete course',
+                    severity: 'error'
+                });
+            }
+        } catch (error) {
+            setAlert({
+                message: error.message || 'An error occurred',
+                severity: 'error'
+            });
+        }
+    };
+
+    const handleEdit = (course) => {
+        setEditData({
+            id: course.id,
+            courseCode: course.courseCode,
+            teacherID: course.teacherID,
+            semesterID: course.semesterID,
+            subjectID: course.subjectID
+        });
+        setOpenEditDialog(true);
+    };
+
+    const handleCloseEdit = () => {
+        setOpenEditDialog(false);
+        setEditData(null);
+    };
+
+    const handleUpdate = async (updatedData) => {
+        try {
+            await courseAPI.update(editData.id, updatedData);
+            setAlert({
+                message: 'Course updated successfully',
+                severity: 'success'
+            });
+            await refetchCourses();
+            handleCloseEdit();
+        } catch (error) {
+            setAlert({
+                message: error.message || 'Failed to update course',
+                severity: 'error'
+            });
+        }
+    };
+
+    if (error) {
+        return <AlertNotify message={error} severity="error" />;
+    }
 
     return (
         <Box m="20px">
@@ -138,16 +158,32 @@ export default function Course() {
                 <AlertNotify
                     message={alert.message}
                     severity={alert.severity}
+                    autoHide={true}
+                    autoHideDelay={3000}
                     onClose={() => setAlert({ message: '', severity: 'info' })}
                 />
             )}
 
-            <DialogCustom
-                title="Confirm Delete"
-                content="Are you sure you want to delete this course?"
-                open={openDialog}
-                handleClose={handleCloseDialog}
-            />
+            {openConfirmDialog && (
+                <YesNoDialogCustom
+                    diaglogTitle={'Confirmation'}
+                    contentTXT={'Do you want to delete this course?'}
+                    onClose={handleCloseDialog}
+                    openState={handleOpenDialog}
+                />
+            )}
+
+            {openEditDialog && (
+                <EditCourseForm
+                    open={openEditDialog}
+                    onClose={handleCloseEdit}
+                    onSubmit={handleUpdate}
+                    initialData={editData}
+                    teachers={teachers}
+                    semesters={semesters}
+                    subjects={subjects}
+                />
+            )}
 
             {/* HEADER */}
             <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -159,6 +195,7 @@ export default function Course() {
                 </Typography>
             </Box>
 
+
             {/* CONTENT SECTION */}
             <Box mt="20px">
                 <Paper sx={{ backgroundColor: 'transparent' }}>
@@ -167,12 +204,12 @@ export default function Course() {
                         <Button
                             variant="contained"
                             color="secondary"
-                            onClick={() => {/* Handle create new */}}
+                            onClick={() => {/* Handle create new */ }}
                         >
                             Create New Course
                         </Button>
                     </Stack>
-                    
+
                     <Box
                         sx={{
                             '& .MuiDataGrid-root': {
@@ -183,7 +220,7 @@ export default function Course() {
                                 borderBottom: 'none'
                             },
                             '& .MuiDataGrid-columnHeaders': {
-                                backgroundColor: colors.blueAccent[700],
+                                backgroundColor: colors.greyAccent[700],
                                 borderBottom: 'none'
                             },
                             height: '70vh',
@@ -193,11 +230,12 @@ export default function Course() {
                     >
                         <DataGrid
                             rows={courses}
+                            getRowId={(row) => row.id}
                             columns={columns}
-                            pagination
-                            paginationModel={paginationModel}
+                            initialState={{ pagination: { paginationModel } }}
+                            pageSizeOptions={[paginationModel.pageSize]}
                             loading={loading}
-                            autoHeight
+                            virtualizeColumnsWithAutoRowHeight
                         />
                     </Box>
                 </Paper>

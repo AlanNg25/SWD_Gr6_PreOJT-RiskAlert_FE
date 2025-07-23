@@ -14,5 +14,8 @@ export const semesterAPI = {
     update: (id, SemesterData) => apiClient(`/api/Semester/${id}`, 'PUT', SemesterData),
 
     // Delete Semester
-    delete: (id) => apiClient(`/api/Semester/${id}`, 'DELETE')
+    delete: (id) => apiClient(`/api/Semester/${id}`, 'DELETE'),
+
+    // Get Semester by Code
+    getByCode: (code) => apiClient(`/api/Semester/code/${code}`)
 };

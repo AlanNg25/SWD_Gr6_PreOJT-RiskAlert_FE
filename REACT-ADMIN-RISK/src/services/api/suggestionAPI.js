@@ -1,7 +1,7 @@
 import { apiClient } from './apiClient';
 
 export const suggestionAPI = {
-    // Get all predictions
+    // Get all Suggestion
     getAll: () => apiClient('/api/Suggestion'),
 
     // Get Suggestion by ID

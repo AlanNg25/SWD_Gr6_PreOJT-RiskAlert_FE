@@ -27,6 +27,7 @@ import NotificationImportantOutlinedIcon from '@mui/icons-material/NotificationI
 // import ChecklistRtlOutlinedIcon from '@mui/icons-material/ChecklistRtlOutlined';
 
 import { Item } from './ItemMenu';
+import { LibraryBooksOutlined } from '@mui/icons-material';
 
 
 const SideBar = () => {
@@ -208,7 +209,7 @@ const SideBar = () => {
                         <Item
                             title="Course"
                             to="/course"
-                            icon={<ClassOutlinedIcon />}
+                            icon={<LibraryBooksOutlined />}
                             selected={selected}
                             setSelected={setSelected}
                             collapsed={collapsed}
@@ -273,14 +274,14 @@ const SideBar = () => {
                             setSelected={setSelected}
                             collapsed={collapsed}
                         /> */}
-                        <Item
+                        {/* <Item
                             title={"Login"}
                             to={"/login"}
                             icon={<LoginOutlinedIcon />}
                             selected={selected}
                             setSelected={setSelected}
                             collapsed={collapsed}
-                        />
+                        /> */}
                         <Item
                             title={"Logout"}
                             to={"/logout"}
